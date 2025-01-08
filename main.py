@@ -33,4 +33,10 @@ train_data = merged_df.iloc[:midpoint].copy()
 test_data = merged_df.iloc[midpoint:].copy()
 
 mean_reversion = MeanReversion(train_data)
-mean_reversion.is_conintegrated('BTC', 'ETH')
+if mean_reversion.is_conintegrated('BTC', 'ETH'):
+    print("We can trade this pair.")
+    print("Evaluating trade...")
+    spread_df = pd.merge(BTC_df['lagged_close'], ETH_df['lagged_close'], left_index=True, right_index=True, how ="inner")
+    spread_df.dropna()
+    spread_df.rename(columns={'lagged_close_x' : 'BTC', 'lagged_close_y' : 'ETH'}, inplace=True)
+    mean_reversion.execute_strategy('BTC', 'ETH', spread_df)
